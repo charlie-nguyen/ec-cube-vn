@@ -1,5 +1,7 @@
 # EC-CUBE 4.0 VI Version
 
+[Website](http://onshop.vn)
+
 ## Cách cài đặt EC-CUBE 4.0
 
 Vui lòng cài đặt theo quy trình về [cách cài đặt](http://docs.ec-cube.vn/?p=253) ở tài liệu phát triển.
