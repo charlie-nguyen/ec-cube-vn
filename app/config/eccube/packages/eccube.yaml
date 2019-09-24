@@ -83,11 +83,11 @@ parameters:
     eccube_csv_import_delimiter: ,
     eccube_csv_import_enclosure: '"'
     eccube_csv_import_escape: \
-    eccube_info_url: 'https://www.ec-cube.net/info/4/'
+    eccube_info_url: 'http://onshop.vn/eccube'
     eccube_owners_store_url: '%env(ECCUBE_OWNERS_STORE_URL)%'
-    eccube_official_site_url: http://onshop.vn
-    eccube_community_site_url: https://www.facebook.com/groups/eccube.vn/
-    eccube_document_url: http://docs.ec-cube.vn/
+    eccube_official_site_url: 'http://onshop.vn'
+    eccube_community_site_url: 'https://www.facebook.com/Onshopvn-106203120763272'
+    eccube_document_url: 'http://onshop.vn/wiki/post'
     eccube_name_len: 20
     eccube_kana_len: 25
     eccube_address1_len: 50
