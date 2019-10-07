@@ -44,6 +44,23 @@ class Environment extends \Twig_Environment
         // プラグインにはテンプレートファイル名, 文字列化されたtwigファイル, パラメータを渡す.
         $event = new TemplateEvent($name, $source, $context);
 
+        preg_match('/{% *extends *[\'\"]default_frame\.twig[\'\"] *%}/', $source, $matches);
+        if (isset($matches[0])) {
+            $this->eventDispatcher->dispatch('default_frame.twig', $event);
+        }
+
+        preg_match('/{% *extends *[\'\"]\@admin\/default_frame\.twig[\'\"] *%}/', $source, $matches);
+        if (isset($matches[0])) {
+            $this->eventDispatcher->dispatch('@admin\default_frame.twig', $event);
+        }
+
+        preg_match_all('/{% *include *[\'\"](.+)[\'\"] *(with.+)? *%}/', $source, $matches, PREG_OFFSET_CAPTURE);
+        if (isset($matches[1])) {
+            foreach ($matches[1] as $includeTwigName) {
+                $this->eventDispatcher->dispatch($includeTwigName[0], $event);
+            }
+        }
+
         // テンプレートフックポイントの実行.
         $this->eventDispatcher->dispatch($name, $event);
 
