@@ -51,7 +51,7 @@ class Environment extends \Twig_Environment
 
         preg_match('/{% *extends *[\'\"]\@admin\/default_frame\.twig[\'\"] *%}/', $source, $matches);
         if (isset($matches[0])) {
-            $this->eventDispatcher->dispatch('@admin\default_frame.twig', $event);
+            $this->eventDispatcher->dispatch('@admin/default_frame.twig', $event);
         }
 
         preg_match_all('/{% *include *[\'\"](.+)[\'\"] *(with.+)? *%}/', $source, $matches, PREG_OFFSET_CAPTURE);
