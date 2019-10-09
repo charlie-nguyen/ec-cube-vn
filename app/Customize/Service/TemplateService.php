@@ -2,6 +2,10 @@
 namespace Customize\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Eccube\Event\EccubeEvents;
+use Eccube\Event\EventArgs;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Eccube\Repository\TemplateRepository;
@@ -43,6 +47,11 @@ class TemplateService
     protected $cacheUtil;
 
     /**
+     * @var EventDispatcher
+     */
+    protected $eventDispatcher;
+
+    /**
      * TemplateService constructor.
      * @param EntityManagerInterface $entityManager
      * @param DeviceTypeRepository $deviceTypeRepository
@@ -57,7 +66,8 @@ class TemplateService
         TemplateRepository $templateRepository,
         KernelInterface $kernel,
         Filesystem $filesystem,
-        \Eccube\Util\CacheUtil $cacheUtil
+        \Eccube\Util\CacheUtil $cacheUtil,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->entityManager = $entityManager;
         $this->deviceTypeRepository = $deviceTypeRepository;
@@ -65,6 +75,7 @@ class TemplateService
         $this->kernel = $kernel;
         $this->filesystem = $filesystem;
         $this->cacheUtil = $cacheUtil;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -140,6 +151,15 @@ class TemplateService
 
         $this->entityManager->persist($Template);
         $this->entityManager->flush();
+
+        // add event
+        $event = new EventArgs(
+            [
+                'template' => $Template
+            ],
+            null
+        );
+        $this->eventDispatcher->dispatch(EccubeEvents::ADMIN_TEMPLATE_INSTALL, $event);
 
         return true;
     }

@@ -15,6 +15,8 @@ namespace Eccube\Controller\Admin\Store;
 
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\Master\DeviceType;
+use Eccube\Event\EccubeEvents;
+use Eccube\Event\EventArgs;
 use Eccube\Form\Type\Admin\TemplateType;
 use Eccube\Repository\Master\DeviceTypeRepository;
 use Eccube\Repository\TemplateRepository;
@@ -92,6 +94,15 @@ class TemplateController extends AbstractController
             $this->addSuccess('admin.common.save_complete', 'admin');
 
             $cacheUtil->clearCache();
+
+            // add event enable
+            $event = new EventArgs(
+                [
+                    'template' => $Template
+                ],
+                null
+            );
+            $this->eventDispatcher->dispatch(EccubeEvents::ADMIN_TEMPLATE_ENABLE, $event);
 
             return $this->redirectToRoute('admin_store_template');
         }
@@ -203,6 +214,16 @@ class TemplateController extends AbstractController
         $this->entityManager->flush();
 
         $this->addSuccess('admin.common.delete_complete', 'admin');
+
+        // add event enable
+        $event = new EventArgs(
+            [
+                'template' => $Template
+            ],
+            null
+        );
+        $this->eventDispatcher->dispatch(EccubeEvents::ADMIN_TEMPLATE_UNINSTALL, $event);
+
 
         return $this->redirectToRoute('admin_store_template');
     }
