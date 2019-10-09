@@ -19,14 +19,18 @@ use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Common\Constant;
 use Eccube\Common\EccubeConfig;
 use Eccube\Entity\Plugin;
+use Eccube\Event\EccubeEvents;
 use Eccube\Exception\PluginException;
 use Eccube\Repository\PluginRepository;
 use Eccube\Service\Composer\ComposerServiceInterface;
 use Eccube\Util\CacheUtil;
 use Eccube\Util\StringUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Filesystem\Filesystem;
+use Eccube\Event\EventArgs;
 
 class PluginService
 {
@@ -101,6 +105,11 @@ class PluginService
     private $systemService;
 
     /**
+     * @var EventDispatcher
+     */
+    protected $eventDispatcher;
+
+    /**
      * PluginService constructor.
      *
      * @param EntityManagerInterface $entityManager
@@ -112,6 +121,7 @@ class PluginService
      * @param CacheUtil $cacheUtil
      * @param ComposerServiceInterface $composerService
      * @param PluginApiService $pluginApiService
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -123,7 +133,8 @@ class PluginService
         CacheUtil $cacheUtil,
         ComposerServiceInterface $composerService,
         PluginApiService $pluginApiService,
-        SystemService $systemService
+        SystemService $systemService,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->entityManager = $entityManager;
         $this->pluginRepository = $pluginRepository;
@@ -137,6 +148,7 @@ class PluginService
         $this->composerService = $composerService;
         $this->pluginApiService = $pluginApiService;
         $this->systemService = $systemService;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -532,6 +544,15 @@ class PluginService
             throw new PluginException($e->getMessage(), $e->getCode(), $e);
         }
 
+        // add event
+        $event = new EventArgs(
+            [
+                'plugin' => $p
+            ],
+            null
+        );
+        $this->eventDispatcher->dispatch(EccubeEvents::ADMIN_PLUGIN_INSTALL, $event);
+
         return $p;
     }
 
@@ -560,6 +581,9 @@ class PluginService
      */
     public function uninstall(Plugin $plugin, $force = true)
     {
+        if ($plugin->getCode() == $this->eccubeConfig->get('os_plugin_core_name')) {
+            return true;
+        }
         $pluginDir = $this->calcPluginDir($plugin->getCode());
         $this->cacheUtil->clearCache();
         $config = $this->readConfig($pluginDir);
@@ -587,6 +611,15 @@ class PluginService
         }
 
         $this->pluginApiService->pluginUninstalled($plugin);
+
+        // add event
+        $event = new EventArgs(
+            [
+                'plugin' => $plugin
+            ],
+            null
+        );
+        $this->eventDispatcher->dispatch(EccubeEvents::ADMIN_PLUGIN_UNINSTALL, $event);
 
         return true;
     }
@@ -653,6 +686,10 @@ class PluginService
 
     public function enable(Plugin $plugin, $enable = true)
     {
+        if ($plugin->getCode() == $this->eccubeConfig->get('os_plugin_core_name') and $enable == false) {
+            return true;
+        }
+
         $em = $this->entityManager;
         try {
             $pluginDir = $this->calcPluginDir($plugin->getCode());
@@ -679,6 +716,15 @@ class PluginService
             $em->getConnection()->rollback();
             throw $e;
         }
+
+        // add event
+        $event = new EventArgs(
+            [
+                'plugin' => $plugin
+            ],
+            null
+        );
+        $this->eventDispatcher->dispatch(EccubeEvents::ADMIN_PLUGIN_ENABLE, $event);
 
         return true;
     }

@@ -591,4 +591,14 @@ final class EccubeEvents
     const MAIL_ADMIN_ORDER = 'mail.admin.order';
     const MAIL_PASSWORD_RESET = 'mail.password.reset';
     const MAIL_PASSWORD_RESET_COMPLETE = 'mail.password.reset.complete';
+
+    /**
+     * PluginService
+     */
+    const ADMIN_PLUGIN_ENABLE = 'admin.plugin.enable';
+    const ADMIN_PLUGIN_UNINSTALL = 'admin.plugin.uninstall';
+    const ADMIN_PLUGIN_INSTALL = 'admin.plugin.install';
+    const ADMIN_TEMPLATE_ENABLE = 'admin.template.enable';
+    const ADMIN_TEMPLATE_INSTALL = 'admin.template.install';
+    const ADMIN_TEMPLATE_UNINSTALL = 'admin.template.uninstall';
 }

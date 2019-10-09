@@ -136,4 +136,5 @@ parameters:
   # onshop
   os_news_iframe_url: '%env(OS_NEWS_IFRAME_URL)%'
   os_plugin_featured_iframe_url: '%env(OS_PLUGINS_FEATURED_IFRAME_URL)%'
+  os_plugin_core_name: 'OSCore'
 
